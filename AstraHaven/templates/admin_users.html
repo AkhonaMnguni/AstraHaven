@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block content %}<p class="eyebrow">Administration</p><h1>User access</h1><section class="panel">{% for user in users %}<div class="row"><span>{{ user.username }}</span><span class="severity low">{{ user.role }}</span></div>{% endfor %}</section>{% endblock %}

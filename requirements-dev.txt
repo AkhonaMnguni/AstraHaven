@@ -1,0 +1,13 @@
+# -r requirements.txt
+# pytest==8.4.1
+# pytest-cov==6.2.1
+
+
+
+-r requirements.txt
+
+pytest==8.4.2
+pytest-cov==6.3.0
+bandit==1.8.6
+ruff==0.13.2
+pip-audit==2.9.0
