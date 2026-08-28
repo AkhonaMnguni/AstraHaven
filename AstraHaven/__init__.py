@@ -36,3 +36,4 @@ def create_app(config_class=Config):
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
+
