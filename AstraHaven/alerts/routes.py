@@ -1,29 +1,118 @@
-from flask import Blueprint, redirect, render_template, url_for
-from flask_login import login_required
+# from flask import Blueprint, redirect, render_template, url_for
+# from flask_login import login_required
+#
+# from ..extensions import db
+# from ..models import Alert
+# from ..security import roles_required
+#
+# alerts_bp = Blueprint("alerts", __name__, url_prefix="/alerts")
+#
+#
+# @alerts_bp.route("/")
+# @login_required
+# def index():
+#     return render_template("alerts.html", alerts=Alert.query.order_by(Alert.created_at.desc()).all())
+#
+#
+# @alerts_bp.route("/<int:alert_id>")
+# @login_required
+# def detail(alert_id):
+#     return render_template("alert_detail.html", alert=db.get_or_404(Alert, alert_id))
+#
+#
+# @alerts_bp.route("/<int:alert_id>/resolve", methods=["POST"])
+# @roles_required("admin", "analyst")
+# def resolve(alert_id):
+#     alert = db.get_or_404(Alert, alert_id)
+#     alert.resolved = True
+#     db.session.commit()
+#     return redirect(url_for("alerts.detail", alert_id=alert.id))
 
+
+
+from flask import (
+    Blueprint,
+    flash,
+    redirect,
+    render_template,
+    url_for,
+)
+
+from ..audit import record_audit
 from ..extensions import db
 from ..models import Alert
-from ..security import roles_required
-
-alerts_bp = Blueprint("alerts", __name__, url_prefix="/alerts")
+from ..security import login_required, roles_required
 
 
-@alerts_bp.route("/")
+alerts_bp = Blueprint(
+    "alerts",
+    __name__,
+    url_prefix="/alerts",
+)
+
+
+@alerts_bp.get("/")
 @login_required
 def index():
-    return render_template("alerts.html", alerts=Alert.query.order_by(Alert.created_at.desc()).all())
+    alerts = db.session.scalars(
+        db.select(Alert)
+        .order_by(
+            Alert.created_at.desc()
+        )
+    ).all()
+
+    return render_template(
+        "alerts.html",
+        alerts=alerts,
+    )
 
 
-@alerts_bp.route("/<int:alert_id>")
+@alerts_bp.get("/<int:alert_id>")
 @login_required
 def detail(alert_id):
-    return render_template("alert_detail.html", alert=db.get_or_404(Alert, alert_id))
+    alert = db.get_or_404(
+        Alert,
+        alert_id,
+    )
+
+    return render_template(
+        "alert_detail.html",
+        alert=alert,
+    )
 
 
-@alerts_bp.route("/<int:alert_id>/resolve", methods=["POST"])
-@roles_required("admin", "analyst")
+@alerts_bp.post(
+    "/<int:alert_id>/resolve"
+)
+@roles_required(
+    "OWNER",
+    "ADMIN",
+    "AUDITOR",
+)
 def resolve(alert_id):
-    alert = db.get_or_404(Alert, alert_id)
-    alert.resolved = True
+    alert = db.get_or_404(
+        Alert,
+        alert_id,
+    )
+
+    alert.status = "RESOLVED"
+
     db.session.commit()
-    return redirect(url_for("alerts.detail", alert_id=alert.id))
+
+    record_audit(
+        "ALERT_RESOLVED",
+        "Alert",
+        alert.id,
+    )
+
+    flash(
+        "Alert marked as resolved.",
+        "success",
+    )
+
+    return redirect(
+        url_for(
+            "alerts.detail",
+            alert_id=alert.id,
+        )
+    )
