@@ -3,6 +3,7 @@ from AstraHaven.models import User
 
 
 def test_password_is_hashed(app):
+    """Verify that stored passwords are not kept in plain text."""
     with app.app_context():
         user = User.query.filter_by(username="admin").one()
         assert user.password_hash != "secret"
@@ -14,6 +15,7 @@ def test_password_is_hashed(app):
 
 
 def test_security_headers(client):
+    """Check that security-related response headers are enabled on the login page."""
 
     response = client.get(
         "/login"
@@ -35,6 +37,7 @@ def test_security_headers(client):
 def test_password_is_not_stored_plaintext(
     app,
 ):
+    """Ensure a user password hash is different from the plaintext secret."""
 
     with app.app_context():
 

@@ -1,6 +1,3 @@
-{% extends "base.html" %}{% block content %}<p class="eyebrow">Financial activity</p><h1>Transactions</h1><section class="panel"><form class="inline-form" method="post" action="{{ url_for('transactions.create') }}"><input name="reference" placeholder="Reference" required><input name="supplier" placeholder="Supplier" required><input name="amount" type="number" step="0.01" min="0" placeholder="Amount" required><button type="submit">Add transaction</button></form></section><section class="panel">{% for transaction in transactions %}<div class="row"><span><b>{{ transaction.reference }}</b> · {{ transaction.supplier }}</span><span>${{ '%.2f'|format(transaction.amount) }} · {{ transaction.status }}{% if transaction.status == 'pending' and current_user.role in ['admin', 'analyst'] %}<form class="inline" method="post" action="{{ url_for('transactions.approve', transaction_id=transaction.id) }}"><button type="submit">Approve</button></form>{% endif %}</span></div>{% else %}<p>No transactions yet.</p>{% endfor %}</section>{% endblock %}
-
-
 {% extends "base.html" %}
 
 {% block title %}
@@ -8,78 +5,43 @@ Transactions — Smart Business Shield
 {% endblock %}
 
 {% block content %}
-
 <h1>Transactions</h1>
 
 {% if create_mode %}
-
 <h2>Create Transaction</h2>
-
 <form method="post">
-
-    <input
-            type="hidden"
-            name="csrf_token"
-            value="{{ csrf_token() }}"
-    >
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
     <label>
         Amount
-        <input
-                type="number"
-                name="amount"
-                step="0.01"
-                min="0.01"
-                required
-        >
+        <input type="number" name="amount" step="0.01" min="0.01" required>
     </label>
 
     <label>
         Category
-        <input
-                type="text"
-                name="category"
-                maxlength="100"
-                required
-        >
+        <input type="text" name="category" maxlength="100" required>
     </label>
 
     <label>
         Description
-        <input
-                type="text"
-                name="description"
-                maxlength="500"
-                required
-        >
+        <input type="text" name="description" maxlength="500" required>
     </label>
 
     <label>
         Invoice Reference
-        <input
-                type="text"
-                name="invoice_reference"
-                maxlength="100"
-                required
-        >
+        <input type="text" name="invoice_reference" maxlength="100" required>
     </label>
 
     <label>
         Date
-        <input
-                type="date"
-                name="transaction_date"
-                required
-        >
+        <input type="date" name="transaction_date" required>
     </label>
 
     <label>
         Branch
         <select name="branch_id" required>
             {% for branch in branches %}
-            <option value="{{ branch.id }}">
-                {{ branch.name }}
-            </option>
+            <option value="{{ branch.id }}">{{ branch.name }}</option>
             {% endfor %}
         </select>
     </label>
@@ -88,9 +50,7 @@ Transactions — Smart Business Shield
         Supplier
         <select name="supplier_id" required>
             {% for supplier in suppliers %}
-            <option value="{{ supplier.id }}">
-                {{ supplier.name }}
-            </option>
+            <option value="{{ supplier.id }}">{{ supplier.name }}</option>
             {% endfor %}
         </select>
     </label>
@@ -99,9 +59,7 @@ Transactions — Smart Business Shield
         Selected By
         <select name="selected_by_id" required>
             {% for employee in employees %}
-            <option value="{{ employee.id }}">
-                {{ employee.name }}
-            </option>
+            <option value="{{ employee.id }}">{{ employee.name }}</option>
             {% endfor %}
         </select>
     </label>
@@ -110,32 +68,19 @@ Transactions — Smart Business Shield
         Approved By
         <select name="approved_by_id" required>
             {% for employee in employees %}
-            <option value="{{ employee.id }}">
-                {{ employee.name }}
-            </option>
+            <option value="{{ employee.id }}">{{ employee.name }}</option>
             {% endfor %}
         </select>
     </label>
 
-    <button type="submit">
-        Create Transaction
-    </button>
-
+    <button type="submit">Create Transaction</button>
 </form>
-
 {% else %}
-
-<a
-        href="{{ url_for('transactions.create') }}"
-        class="button"
->
-    New Transaction
-</a>
-
+<a href="{{ url_for('transactions.create') }}" class="button">New Transaction</a>
 <table>
-
     <thead>
     <tr>
+        <th>Reference</th>
         <th>Date</th>
         <th>Amount</th>
         <th>Category</th>
@@ -143,41 +88,18 @@ Transactions — Smart Business Shield
         <th>Branch</th>
     </tr>
     </thead>
-
     <tbody>
-
     {% for transaction in transactions %}
-
     <tr>
-
-        <td>
-            {{ transaction.transaction_date }}
-        </td>
-
-        <td>
-            R {{ "%.2f"|format(transaction.amount) }}
-        </td>
-
-        <td>
-            {{ transaction.category }}
-        </td>
-
-        <td>
-            {{ transaction.supplier.name }}
-        </td>
-
-        <td>
-            {{ transaction.branch.name }}
-        </td>
-
+        <td>{{ transaction.invoice_reference }}</td>
+        <td>{{ transaction.transaction_date }}</td>
+        <td>R {{ "%.2f"|format(transaction.amount) }}</td>
+        <td>{{ transaction.category }}</td>
+        <td>{{ transaction.supplier.name }}</td>
+        <td>{{ transaction.branch.name }}</td>
     </tr>
-
     {% endfor %}
-
     </tbody>
-
 </table>
-
 {% endif %}
-
 {% endblock %}

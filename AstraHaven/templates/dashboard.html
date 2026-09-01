@@ -1,6 +1,3 @@
-{% extends "base.html" %}{% block content %}<div class="page-heading"><div><p class="eyebrow">Overview</p><h1>Good morning, {{ current_user.username }}.</h1></div></div><section class="metrics"><div><span>Transactions</span><strong>{{ transaction_count }}</strong></div><div><span>Open alerts</span><strong>{{ open_alerts }}</strong></div><div><span>Access level</span><strong>{{ current_user.role|title }}</strong></div></section><section class="panel"><h2>Recent transactions</h2>{% for transaction in recent_transactions %}<div class="row"><span>{{ transaction.reference }} · {{ transaction.supplier }}</span><span>${{ '%.2f'|format(transaction.amount) }} · {{ transaction.status }}</span></div>{% else %}<p>No transactions yet.</p>{% endfor %}</section>{% endblock %}
-
-
 {% extends "base.html" %}
 
 {% block title %}
@@ -8,103 +5,56 @@ Dashboard — Smart Business Shield
 {% endblock %}
 
 {% block content %}
-
 <h1>Business Health Dashboard</h1>
 
 <div class="cards">
-
     <div class="card">
-    <h3>Total Transactions</h3>
-    <strong>
-    {{ total_transactions }}
-    </strong>
+        <h3>Total Transactions</h3>
+        <strong>{{ total_transactions }}</strong>
     </div>
 
     <div class="card">
-    <h3>Total Transaction Value</h3>
-    <strong>
-    R {{ "%.2f"|format(total_value or 0) }}
-    </strong>
+        <h3>Total Transaction Value</h3>
+        <strong>R {{ "%.2f"|format(total_value or 0) }}</strong>
     </div>
 
     <div class="card">
-    <h3>Open Alerts</h3>
-    <strong>
-    {{ open_alerts }}
-    </strong>
+        <h3>Open Alerts</h3>
+        <strong>{{ open_alerts }}</strong>
     </div>
 
     <div class="card danger">
-    <h3>High/Critical Alerts</h3>
-    <strong>
-    {{ high_alerts }}
-    </strong>
+        <h3>High/Critical Alerts</h3>
+        <strong>{{ high_alerts }}</strong>
     </div>
-
 </div>
 
 <h2>Recent Alerts</h2>
 
 {% if recent_alerts %}
-
 <table>
-
     <thead>
-<tr>
-    <th>Severity</th>
-    <th>Alert</th>
-    <th>Risk Score</th>
-    <th>Status</th>
-    <th></th>
+    <tr>
+        <th>Severity</th>
+        <th>Alert</th>
+        <th>Risk Score</th>
+        <th>Status</th>
+        <th></th>
     </tr>
-</thead>
-
+    </thead>
     <tbody>
-
-{% for alert in recent_alerts %}
-
-<tr>
-
-    <td>
-    <span class="severity {{ alert.severity|lower }}">
- {{ alert.severity }}
- </span>
-    </td>
-
-    <td>
-    {{ alert.title }}
-    </td>
-    <td>
-    {{ alert.risk_score }}/100
-    </td>
-
-    <td>
-    {{ alert.status }}
-    </td>
-
-    <td>
-    <a
-        href="{{ url_for(
- 'alerts.detail',
- alert_id=alert.id
- ) }}"
-        >
-    Investigate
-    </a>
-    </td>
-
+    {% for alert in recent_alerts %}
+    <tr>
+        <td><span class="severity {{ alert.severity|lower }}">{{ alert.severity }}</span></td>
+        <td>{{ alert.title }}</td>
+        <td>{{ alert.risk_score }}/100</td>
+        <td>{{ alert.status }}</td>
+        <td><a href="{{ url_for('alerts.detail', alert_id=alert.id) }}">Investigate</a></td>
     </tr>
-
-{% endfor %}
-
-</tbody>
-
+    {% endfor %}
+    </tbody>
 </table>
-
 {% else %}
-
 <p>No alerts have been generated.</p>
-
 {% endif %}
-
 {% endblock %}

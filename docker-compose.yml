@@ -12,28 +12,28 @@
 #volumes:
 #  astrahaven-data:
 
-#services:
-#
-#  db:
-#    image: postgres:17
-#    environment:
-#      POSTGRES_DB: AstraHaven
-#      POSTGRES_USER: AstraHaven
-#      POSTGRES_PASSWORD: AstraHaven_password
-#    ports:
-#      - "5432:5432"
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
-#
-#  app:
-#    build: .
-#    depends_on:
-#      - db
-#    environment:
-#      SECRET_KEY: change-this-demo-secret
-#      DATABASE_URL: postgresql+psycopg://smartshield:smartshield_password@db:5432/smartshield
-#    ports:
-#      - "5000:5000"
-#
-#volumes:
-#  postgres_data:
+services:
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: AstraHaven
+      POSTGRES_USER: AstraHaven
+      POSTGRES_PASSWORD: AstraHaven_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      SECRET_KEY: change-this-demo-secret
+      DATABASE_URL: postgresql+psycopg://smartshield:smartshield_password@db:5432/smartshield
+    ports:
+      - "5000:5000"
+
+volumes:
+  postgres_data:

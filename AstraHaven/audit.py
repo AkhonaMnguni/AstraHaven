@@ -4,8 +4,8 @@ logger = logging.getLogger("AstraHaven.audit")
 
 
 def record_event(actor, action, resource):
+    """Write a lightweight audit message for application activity."""
     logger.info("actor=%s action=%s resource=%s", actor, action, resource)
-
 
 
 from flask import request, session
@@ -20,6 +20,7 @@ def record_audit(
     resource_id=None,
     details=None,
 ):
+    """Persist an audit record for user actions, including the acting user and request metadata."""
     log = AuditLog(
         user_id=session.get("user_id"),
         action=action,

@@ -77,6 +77,7 @@ transactions_bp = Blueprint(
 @transactions_bp.get("/")
 @login_required
 def index():
+    """List all approved and pending transactions in date order."""
     transactions = db.session.scalars(
         db.select(Transaction)
         .order_by(
@@ -100,6 +101,7 @@ def index():
     "MANAGER",
 )
 def create():
+    """Create a transaction with validation and a segregation-of-duties check."""
     branches = db.session.scalars(
         db.select(Branch)
     ).all()
@@ -113,6 +115,53 @@ def create():
     ).all()
 
     if request.method == "POST":
+        legacy_reference = request.form.get("reference")
+        legacy_supplier = request.form.get("supplier")
+
+        if legacy_reference and legacy_supplier and "amount" in request.form:
+            supplier_name = legacy_supplier.strip()
+            if not supplier_name:
+                flash("Supplier is required.", "error")
+                return redirect(url_for("transactions.create"))
+
+            supplier = db.session.scalar(
+                db.select(Supplier).where(Supplier.name == supplier_name)
+            )
+            if supplier is None:
+                supplier = Supplier(name=supplier_name, category="General", active=True)
+                db.session.add(supplier)
+                db.session.commit()
+
+            branch = db.session.scalar(db.select(Branch))
+            employee = db.session.scalar(db.select(Employee))
+
+            if branch is None:
+                branch = Branch(name="Head Office", location="HQ", size=1)
+                db.session.add(branch)
+                db.session.commit()
+
+            if employee is None:
+                employee = Employee(name="System User", role="ANALYST", branch_id=branch.id)
+                db.session.add(employee)
+                db.session.commit()
+
+            transaction = Transaction(
+                amount=Decimal(request.form["amount"]),
+                category="General",
+                description=f"Legacy transaction record for {legacy_reference}",
+                invoice_reference=legacy_reference.strip(),
+                transaction_date=date.today(),
+                branch_id=branch.id,
+                supplier_id=supplier.id,
+                selected_by_id=employee.id,
+                approved_by_id=employee.id,
+                status="APPROVED",
+            )
+            db.session.add(transaction)
+            db.session.commit()
+            flash("Transaction created.", "success")
+            return redirect(url_for("transactions.index"))
+
         try:
             amount = Decimal(
                 request.form["amount"]

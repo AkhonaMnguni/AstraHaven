@@ -6,6 +6,8 @@ BASE_DIR = Path(__file__).resolve().parent
 
 
 class Config:
+    """Base Flask configuration for the application in normal runtime."""
+
     SECRET_KEY = os.getenv("SECRET_KEY", "change-this-development-key")
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL", f"sqlite:///{BASE_DIR / 'astrahaven.db'}"
@@ -15,6 +17,8 @@ class Config:
 
 
 class TestingConfig(Config):
+    """Test configuration that runs against an in-memory SQLite database."""
+
     TESTING = True
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"

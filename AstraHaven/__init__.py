@@ -1,17 +1,30 @@
 from flask import Flask
 
 from config import Config
-from .extensions import db, login_manager
+from .extensions import csrf, db, limiter, login_manager
 from .models import User
 
 
 def create_app(config_class=Config):
+    """Create the Flask app, attach extensions, register routes, and initialize the database."""
     app = Flask(__name__)
     app.config.from_object(config_class)
 
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
+    csrf.init_app(app)
+    limiter.init_app(app)
+
+    @app.after_request
+    def add_security_headers(response):
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+        )
+        return response
 
     from .admin.routes import admin_bp
     from .alerts.routes import alerts_bp
@@ -35,5 +48,6 @@ def create_app(config_class=Config):
 
 @login_manager.user_loader
 def load_user(user_id):
+    """Look up the logged-in user from the current session identifier."""
     return db.session.get(User, int(user_id))
 

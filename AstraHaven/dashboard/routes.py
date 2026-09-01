@@ -38,6 +38,7 @@ dashboard_bp = Blueprint(
 @dashboard_bp.get("/")
 @login_required
 def index():
+    """Summarize key exposure metrics such as transaction totals, open alerts, and recent activity."""
     total_transactions = db.session.scalar(
         db.select(
             func.count(Transaction.id)

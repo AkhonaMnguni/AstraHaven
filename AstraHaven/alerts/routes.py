@@ -54,6 +54,7 @@ alerts_bp = Blueprint(
 @alerts_bp.get("/")
 @login_required
 def index():
+    """List all alert records in reverse chronological order for investigation."""
     alerts = db.session.scalars(
         db.select(Alert)
         .order_by(
@@ -70,6 +71,7 @@ def index():
 @alerts_bp.get("/<int:alert_id>")
 @login_required
 def detail(alert_id):
+    """Open a single alert record so the user can review findings and recommendations."""
     alert = db.get_or_404(
         Alert,
         alert_id,
@@ -90,6 +92,7 @@ def detail(alert_id):
     "AUDITOR",
 )
 def resolve(alert_id):
+    """Mark an alert as resolved and record the action for audit history."""
     alert = db.get_or_404(
         Alert,
         alert_id,

@@ -54,6 +54,7 @@ auth_bp = Blueprint(
 @auth_bp.route("/login", methods=["GET", "POST"])
 @limiter.limit("5 per minute")
 def login():
+    """Authenticate a user by username or email and create the session on success."""
     if request.method == "POST":
         username = request.form.get(
             "username",
@@ -107,8 +108,9 @@ def login():
     return render_template("login.html")
 
 
-@auth_bp.post("/logout")
+@auth_bp.route("/logout", methods=["GET", "POST"])
 def logout():
+    """Clear the active session and record the logout event for auditing."""
     user_id = session.get("user_id")
 
     if user_id:
