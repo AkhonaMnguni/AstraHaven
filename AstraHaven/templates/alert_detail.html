@@ -1,1 +1,149 @@
 {% extends "base.html" %}{% block content %}<p class="eyebrow">Alert detail</p><h1>{{ alert.title }}</h1><section class="panel"><span class="severity {{ alert.severity }}">{{ alert.severity }}</span><p>{{ alert.description }}</p><p>Status: {{ 'Resolved' if alert.resolved else 'Open' }}</p>{% if not alert.resolved and current_user.role in ['admin', 'analyst'] %}<form method="post" action="{{ url_for('alerts.resolve', alert_id=alert.id) }}"><button type="submit">Resolve alert</button></form>{% endif %}</section>{% endblock %}
+
+
+{% extends "base.html" %}
+
+{% block title %}
+Alert Investigation — Smart Business Shield
+{% endblock %}
+
+{% block content %}
+
+<div class="alert-header">
+
+    <span class="severity {{ alert.severity|lower }}">
+ {{ alert.severity }}
+ </span>
+
+    <h1>
+    {{ alert.title }}
+    </h1>
+
+    <p>
+    Risk score:
+    <strong>
+    {{ alert.risk_score }}/100
+    </strong>
+    </p>
+
+</div>
+
+<section class="panel">
+
+       <h2>Why was this flagged?</h2>
+
+    <div class="explanation">
+    {{ alert.explanation|replace('\n', '<br>')|safe }}
+    </div>
+
+</section>
+
+<section class="warning">
+
+    <h2>Important</h2>
+
+    <p>
+    This alert does not prove fraud.
+    It identifies an unusual pattern that
+    requires human investigation.
+    </p>
+
+</section>
+
+<section class="panel">
+
+    <h2>Recommended Investigation</h2>
+
+    <p>
+    {{ alert.recommendation }}
+    </p>
+
+    <ul>
+    <li>Verify the original invoice.</li>
+    <li>Verify delivery or service evidence.</li>
+    <li>Compare supplier pricing.</li>
+    <li>Review supplier information.</li>
+    <li>Review approval history.</li>
+    <li>Compare comparable branches.</li>
+    </ul>
+
+</section>
+
+{% if alert.transaction %}
+
+<section class="panel">
+
+       <h2>Related Transaction</h2>
+
+    <table>
+
+    <tr>
+    <th>Amount</th>
+    <td>
+    R {{ "%.2f"|format(alert.transaction.amount) }}
+    </td>
+    </tr>
+
+    <tr>
+    <th>Category</th>
+    <td>
+    {{ alert.transaction.category }}
+    </td>
+    </tr>
+
+    <tr>
+    <th>Description</th>
+    <td>
+    {{ alert.transaction.description }}
+    </td>
+    </tr>
+
+    <tr>
+    <th>Invoice</th>
+    <td>
+    {{ alert.transaction.invoice_reference }}
+    </td>
+    </tr>
+
+    <tr>
+    <th>Supplier</th>
+    <td>
+    {{ alert.transaction.supplier.name }}
+    </td>
+    </tr>
+
+    </table>
+
+</section>
+
+{% endif %}
+
+{% if session.get("role") in [
+"OWNER",
+"ADMIN",
+"AUDITOR"
+] and alert.status == "OPEN" %}
+
+<form
+        method="post"
+        action="{{ url_for(
+ 'alerts.resolve',
+ alert_id=alert.id
+ ) }}"
+>
+
+    <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+        >
+
+    <button type="submit">
+    Mark Investigation Complete
+    </button>
+
+</form>
+
+{% endif %}
+
+{% endblock %}

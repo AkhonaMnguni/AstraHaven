@@ -1,1 +1,79 @@
 {% extends "base.html" %}{% block content %}<p class="eyebrow">Monitoring</p><h1>Alerts</h1><section class="panel">{% for alert in alerts %}<a class="row" href="{{ url_for('alerts.detail', alert_id=alert.id) }}"><span><b>{{ alert.title }}</b><small>{{ alert.created_at }}</small></span><span class="severity {{ alert.severity }}">{{ alert.severity }}</span></a>{% else %}<p>No alerts recorded.</p>{% endfor %}</section>{% endblock %}
+
+
+{% extends "base.html" %}
+
+{% block title %}
+Alerts — Smart Business Shield
+{% endblock %}
+
+{% block content %}
+
+<h1>Investigation Alerts</h1>
+
+<p>
+    These alerts identify unusual patterns.
+    They do not prove fraud or wrongdoing.
+</p>
+
+<table>
+
+    <thead>
+    <tr>
+        <th>Severity</th>
+        <th>Title</th>
+        <th>Score</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th></th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    {% for alert in alerts %}
+
+    <tr>
+
+        <td>
+        <span class="severity {{ alert.severity|lower }}">
+ {{ alert.severity }}
+ </span>
+        </td>
+
+        <td>
+        {{ alert.title }}
+        </td>
+
+        <td>
+        {{ alert.risk_score }}/100
+        </td>
+
+        <td>
+        {{ alert.status }}
+        </td>
+
+        <td>
+        {{ alert.created_at }}
+        </td>
+
+        <td>
+        <a
+            href="{{ url_for(
+ 'alerts.detail',
+ alert_id=alert.id
+ ) }}"
+            >
+        View
+        </a>
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}
