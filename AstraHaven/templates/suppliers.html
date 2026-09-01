@@ -1,1 +1,79 @@
 {% extends "base.html" %}{% block content %}<p class="eyebrow">Partner network</p><h1>Suppliers</h1><section class="panel">{% for name, transactions in suppliers.items() %}<div class="row"><span><b>{{ name }}</b><small>{{ transactions|length }} transaction(s)</small></span><span>${{ '%.2f'|format(transactions|sum(attribute='amount')) }}</span></div>{% else %}<p>No suppliers yet.</p>{% endfor %}</section>{% endblock %}
+
+
+{% extends "base.html" %}
+
+{% block title %}
+Suppliers — Smart Business Shield
+{% endblock %}
+
+{% block content %}
+
+<h1>Suppliers</h1>
+
+<form
+        method="post"
+        action="{{ url_for('suppliers.create') }}"
+>
+
+    <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+    >
+
+    <label>
+        Supplier Name
+        <input
+                type="text"
+                name="name"
+                maxlength="200"
+                required
+        >
+    </label>
+
+    <label>
+        Category
+        <input
+                type="text"
+                name="category"
+                maxlength="100"
+                required
+        >
+    </label>
+
+    <button type="submit">
+        Add Supplier
+    </button>
+
+</form>
+
+<hr>
+
+<table>
+
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Active</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    {% for supplier in suppliers %}
+
+    <tr>
+        <td>{{ supplier.name }}</td>
+        <td>{{ supplier.category }}</td>
+        <td>{{ "Yes" if supplier.active else "No" }}</td>
+    </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

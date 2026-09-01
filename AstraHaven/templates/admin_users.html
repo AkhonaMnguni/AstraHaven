@@ -1,1 +1,105 @@
 {% extends "base.html" %}{% block content %}<p class="eyebrow">Administration</p><h1>User access</h1><section class="panel">{% for user in users %}<div class="row"><span>{{ user.username }}</span><span class="severity low">{{ user.role }}</span></div>{% endfor %}</section>{% endblock %}
+
+
+{% extends "base.html" %}
+
+{% block title %}
+Administration — Smart Business Shield
+{% endblock %}
+
+{% block content %}
+
+<h1>User Administration</h1>
+
+<table>
+
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Current Role</th>
+        <th>Active</th>
+        <th>Change Role</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    {% for user in users %}
+
+    <tr>
+
+        <td>{{ user.username }}</td>
+
+        <td>{{ user.email }}</td>
+
+        <td>{{ user.role }}</td>
+
+        <td>
+            {{ "Yes" if user.active else "No" }}
+        </td>
+
+        <td>
+
+            {% if session.get("role") == "OWNER" %}
+
+            <form
+                    method="post"
+                    action="{{ url_for(
+                'admin.change_role',
+                user_id=user.id
+            ) }}"
+            >
+
+                <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                >
+
+                <select name="role">
+
+                    {% for role in [
+                    "OWNER",
+                    "ADMIN",
+                    "AUDITOR",
+                    "MANAGER",
+                    "ANALYST"
+                    ] %}
+
+                    <option
+                            value="{{ role }}"
+                            {% if user.role == role %}
+                            selected
+                            {% endif %}
+                    >
+                        {{ role }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit">
+                    Update
+                </button>
+
+            </form>
+
+            {% else %}
+
+            Owner only
+
+            {% endif %}
+
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}
