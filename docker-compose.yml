@@ -31,7 +31,7 @@ services:
       - db
     environment:
       SECRET_KEY: change-this-demo-secret
-      DATABASE_URL: postgresql+psycopg://smartshield:smartshield_password@db:5432/smartshield
+      DATABASE_URL: postgresql+psycopg://astrahaven:astrahaven_password@db:5432/astrahaven
     ports:
       - "5000:5000"
 

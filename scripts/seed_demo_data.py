@@ -21,13 +21,13 @@ with app.app_context():
     db.session.add_all([cape_town, durban, johannesburg])
     db.session.flush()
 
-    owner = User(username="owner", email="owner@smartshield.local", role="OWNER", branch_id=cape_town.id)
+    owner = User(username="owner", email="owner@astrahaven.local", role="OWNER", branch_id=cape_town.id)
     owner.set_password("OwnerPassword123!")
 
-    admin = User(username="admin", email="admin@smartshield.local", role="ADMIN", branch_id=cape_town.id)
+    admin = User(username="admin", email="admin@astrahaven.local", role="ADMIN", branch_id=cape_town.id)
     admin.set_password("AdminPassword123!")
 
-    analyst = User(username="analyst", email="analyst@smartshield.local", role="ANALYST", branch_id=cape_town.id)
+    analyst = User(username="analyst", email="analyst@astrahaven.local", role="ANALYST", branch_id=cape_town.id)
     analyst.set_password("AnalystPassword123!")
 
     db.session.add_all([owner, admin, analyst])
