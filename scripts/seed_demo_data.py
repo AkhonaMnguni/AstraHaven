@@ -1,4 +1,9 @@
 """Seed the application database with demo branches, users, suppliers, and transactions."""
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from datetime import date, timedelta
 from decimal import Decimal
